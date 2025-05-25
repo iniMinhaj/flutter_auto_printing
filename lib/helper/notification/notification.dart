@@ -3,15 +3,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:auto_printing/helper/controller/auto_printer.dart';
+import 'package:auto_printing/helper/controller/auto_printer_controller.dart';
 import 'package:auto_printing/helper/notification/model/notification_body.dart';
-import 'package:auto_printing/helper/notification/model/payload_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+final autoPrintController = Get.put(AutoPrintingController());
 
 class NotificationHelper {
   void notificationPermission() async {
@@ -32,7 +33,8 @@ class NotificationHelper {
         );
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint("User granted permission");
-    } else if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       debugPrint("User granted provisional permission");
     } else {
       debugPrint("User denied permission");
@@ -53,19 +55,7 @@ class NotificationHelper {
 
     flutterLocalNotificationsPlugin.initialize(
       initializationsSettings,
-      onDidReceiveNotificationResponse: (payload) async {
-        // try {
-        //   if (payload.payload != null && payload.payload != '') {
-        //     PayLoadBody payLoadBody = PayLoadBody.fromJson(
-        //       jsonDecode(payload.payload!),
-        //     );
-        //     if (payLoadBody.topicName == 'Order Notification') {
-        //       // Get.to(() => OrderView());
-        //     }
-        //   }
-        // } catch (e) {}
-        // return;
-      },
+      onDidReceiveNotificationResponse: (payload) async {},
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -74,57 +64,38 @@ class NotificationHelper {
         flutterLocalNotificationsPlugin,
         false,
       );
-      // print('🔥 Received a message in onMessage');
-      // print("Message body - ${message.notification?.body}");
-      // print('Full Message: ${message.toMap()}');
+      print('🔥 Received a message in onMessage');
+      print("Message body - ${message.notification?.body}");
+      print('Full Message: ${message.toMap()}');
+
       if (message != null) {
+        String orderId = message.notification!.body.toString();
+
+        print("NOtfi order id = $orderId");
+
+        print("Order details fetching.....");
+        await autoPrintController.fetchOrderDetails(orderId: orderId);
+
         print("Auto Printing started.....");
+        await autoPrintController.connectAndPrint(
+          modelName: autoPrintController.selectedPrinter.value!.name!,
+        );
+      } else {
+        print("kichu pai nai...");
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) async {
+      print('Full Message: ${message!.toMap()}');
+
+      if (message != null) {
+        print("Auto Printing started onMessageOpenedApp.....");
         await Get.put(
           AutoPrintingController(),
         ).connectAndPrint(modelName: 'PT-210');
       } else {
         print("kichu pai nai...");
       }
-      // //  var orderController = Get.put(OrderController());
-
-      //   orderController.orderNotificationId.value =
-      //       message.data["order_id"].toString();
-      //   if (message.data["order_id"].toString() == "") {
-      //     orderController.orderNotfyLoader.value = false;
-      //   } else {
-      //     orderController.orderNotfyLoader.value = true;
-      //   }
-
-      // try {
-      //   if (message != null && message.data.isNotEmpty) {
-      //     NotificationBody _notificationBody = convertNotification(
-      //       message.data,
-      //     );
-
-      //     if (_notificationBody.topic == 'Order Notification') {
-      //       // Get.to(() => OrderView());
-      //     }
-      //   }
-      // } catch (e) {
-      //   print(e.toString());
-      // }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) {
-      print("onMessageOpenedApp --- ${message}");
-
-      // try {
-      //   if (message != null && message.data.isNotEmpty) {
-      //     NotificationBody _notificationBody = convertNotification(
-      //       message.data,
-      //     );
-      //     if (_notificationBody.topic == 'general') {
-      //       //  Get.to(() => OrderView());
-      //     }
-      //   }
-      // } catch (e) {
-      //   print(e.toString());
-      // }
     });
   }
 

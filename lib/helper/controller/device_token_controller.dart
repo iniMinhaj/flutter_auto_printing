@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:auto_printing/data/repository/device_token_repo.dart';
+import 'package:auto_printing/util/api_list.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 
 final postToken = 'https://web.inilabs.dev/api/frontend/device-token/mobile';
@@ -10,21 +13,34 @@ final authorizationToken =
     "Bearer 7|CrvNC3KgLNC4I1wLZTOQGSRztZaqOWGkbv5Or3oV6bd4b0ed";
 
 class DeviceTokenController extends GetxController {
+  final tokenRepo = DeviceTokenRepo();
   bool loader = false;
-  Future postDeviceToken(token) async {
+
+  Future<String> getDeviceToken() async {
+    final deviceId = await tokenRepo.getDeviceToken() ?? "";
+    return deviceId;
+  }
+
+  Future postDeviceToken({
+    required String deviceId,
+    required int printRoleId,
+  }) async {
     loader = true;
     update();
-    Map body = {'token': token};
-    // String jsonBody = json.encode(body);
+    Map<String, dynamic> body = {
+      'device_id': deviceId,
+      'print_role_id': printRoleId,
+    };
     try {
+      print("Auto Print Body: ${jsonEncode(body)}");
       http
           .post(
-            Uri.parse(postToken),
-            body: jsonEncode({'token': token}),
+            Uri.parse(ApiList.autoPrint),
+            body: jsonEncode(body),
             headers: _getHttpHeaders(),
           )
           .then((response) {
-            print(response.body);
+            print('Submit Token status: ${response.statusCode}');
             if (response.statusCode == 200) {
               print(response.body);
               loader = false;
@@ -45,10 +61,9 @@ class DeviceTokenController extends GetxController {
 
   static Map<String, String> _getHttpHeaders() {
     Map<String, String> headers = <String, String>{};
-    headers['Authorization'] = authorizationToken;
-    headers['x-api-key'] = licenseCode;
-    headers['Content-Type'] = 'application/json';
-    headers['Accept'] = 'application/json';
+    // headers['Authorization'] = authorizationToken;
+    headers['x-api-key'] = ApiList.licenseCode.toString();
+    headers['content-type'] = 'application/json';
 
     return headers;
   }

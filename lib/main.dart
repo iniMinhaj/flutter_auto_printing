@@ -1,7 +1,5 @@
-import 'package:auto_printing/helper/device_token.dart';
-import 'package:auto_printing/helper/notification/model/notification_body.dart';
 import 'package:auto_printing/helper/notification/notification.dart';
-import 'package:auto_printing/hompage.dart';
+import 'package:auto_printing/view/hompage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +14,10 @@ void main() async {
   await Firebase.initializeApp();
   await GetStorage.init();
 
-  DeviceToken token = DeviceToken();
-  token.getDeviceToken();
-
-  NotificationBody? body;
   try {
     final RemoteMessage? remoteMessage =
         await FirebaseMessaging.instance.getInitialMessage();
-    print("Remote Message - $remoteMessage");
-    if (remoteMessage != null) {
-      body = NotificationHelper.convertNotification(remoteMessage.data);
-    }
+    if (remoteMessage != null) {}
     await NotificationHelper.initialize(flutterLocalNotificationsPlugin);
   } catch (e) {
     debugPrint(e.toString());
@@ -39,6 +30,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Flutter Demo', home: Homepage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      home: Homepage(),
+    );
   }
 }
