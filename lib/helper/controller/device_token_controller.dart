@@ -32,7 +32,7 @@ class DeviceTokenController extends GetxController {
       'print_role_id': printRoleId,
     };
     try {
-      print("Auto Print Body: ${jsonEncode(body)}");
+      debugPrint("Auto Print Body: ${jsonEncode(body)}");
       http
           .post(
             Uri.parse(ApiList.autoPrint),
@@ -40,10 +40,10 @@ class DeviceTokenController extends GetxController {
             headers: _getHttpHeaders(),
           )
           .then((response) {
-            print('Submit Token status: ${response.statusCode}');
-            if (response.statusCode == 200) {
-              print(response.body);
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              debugPrint(response.body);
               loader = false;
+
               update();
             } else {
               loader = false;
@@ -61,7 +61,6 @@ class DeviceTokenController extends GetxController {
 
   static Map<String, String> _getHttpHeaders() {
     Map<String, String> headers = <String, String>{};
-    // headers['Authorization'] = authorizationToken;
     headers['x-api-key'] = ApiList.licenseCode.toString();
     headers['content-type'] = 'application/json';
 

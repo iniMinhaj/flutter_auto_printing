@@ -12,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+import '../../widget/custom_snackbar.dart';
+
 final autoPrintController = Get.put(AutoPrintingController());
 
 class NotificationHelper {
@@ -76,10 +78,18 @@ class NotificationHelper {
         print("Order details fetching.....");
         await autoPrintController.fetchOrderDetails(orderId: orderId);
 
-        print("Auto Printing started.....");
-        await autoPrintController.connectAndPrint(
-          modelName: autoPrintController.selectedPrinter.value!.name!,
+        print(
+          "Selected Printer = ${autoPrintController.selectedPrinter.value}",
         );
+
+        if (autoPrintController.selectedPrinter.value == null) {
+          await customSnackbar("ERROR", "No printer was selected", Colors.red);
+        } else {
+          print("Auto Printing started.....");
+          await autoPrintController.connectAndPrint(
+            modelName: autoPrintController.selectedPrinter.value!.name!,
+          );
+        }
       } else {
         print("kichu pai nai...");
       }

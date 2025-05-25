@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:auto_printing/data/model/order_details_model.dart';
 import 'package:auto_printing/util/api_list.dart';
+import 'package:auto_printing/widget/custom_snackbar.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
@@ -17,12 +17,11 @@ class AutoPrintingController extends GetxController {
 
   Future<void> fetchPairedPrinters() async {
     List<BluetoothDevice> pairedDevices = await printer.getBondedDevices();
-    print("Paired Devices = $pairedDevices");
     if (pairedDevices.isNotEmpty) {
       devices.clear();
       devices.addAll(pairedDevices);
     } else {
-      print("No Printer Found.");
+      customSnackbar("ERROR", "No Printer Found.", Colors.red);
     }
   }
 
@@ -35,14 +34,12 @@ class AutoPrintingController extends GetxController {
           'content-type': 'application/json',
         },
       );
-      print("OrderApi = ${ApiList.orderDetails(orderId: orderId)}");
-      print("Respone - ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         orderDetailsModel = OrderDetailsModel.fromJson(data);
-        print("OrderDetaisl in method = ${orderDetailsModel.data?.orderItems}");
       } else {
-        print(response.body);
+        debugPrint(response.body);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -50,29 +47,14 @@ class AutoPrintingController extends GetxController {
   }
 
   Future<void> connectAndPrint({required String modelName}) async {
-    //  List<BluetoothDevice> devices = await printer.getBondedDevices();
-
-    // BluetoothDevice? myPrinter = devices.firstWhere(
-    //   (d) => d.name != null && d.name!.contains(modelName),
-
-    //   orElse: () {
-    //     final error = BluetoothDevice(null, null);
-    //     return error;
-    //   },
-    // );
-
-    print("Connected Device: ${selectedPrinter.value?.name}");
-
     if (selectedPrinter.value!.name != null) {
       bool isConnected = await printer.isConnected ?? false;
 
       if (!isConnected) {
         await printer.connect(selectedPrinter.value!);
       } else {
-        print("Already connected to a printer");
+        debugPrint("Already connected to a printer");
       }
-
-      print("OrderDetails = ${orderDetailsModel.data}");
 
       if (orderDetailsModel.data != null) {
         // -----------------[ START - Invoice Design ]---------------------
@@ -117,10 +99,10 @@ class AutoPrintingController extends GetxController {
 
         // -----------------[ END - Invoice Design ]---------------------
       } else {
-        print("No data found");
+        debugPrint("No data found");
       }
     } else {
-      print("Printer not found");
+      debugPrint("Printer not found");
     }
   }
 }

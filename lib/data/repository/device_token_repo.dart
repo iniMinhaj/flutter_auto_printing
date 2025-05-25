@@ -7,7 +7,7 @@ class DeviceTokenRepo {
     try {
       deviceToken = await FirebaseMessaging.instance.getToken();
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
     }
     if (deviceToken != null) {
       debugPrint('--------Device Token---------- $deviceToken');

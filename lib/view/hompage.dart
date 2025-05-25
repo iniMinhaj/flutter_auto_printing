@@ -1,5 +1,6 @@
 import 'package:auto_printing/helper/controller/auto_printer_controller.dart';
 import 'package:auto_printing/helper/controller/device_token_controller.dart';
+import 'package:auto_printing/widget/custom_snackbar.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -63,6 +64,13 @@ class _HomepageState extends State<Homepage> {
 
             ElevatedButton(
               onPressed: () async {
+                if (autoPrintController.selectedPrinter.value?.name == null) {
+                  return customSnackbar(
+                    "ERROR",
+                    "Please Select Printer First.",
+                    Colors.red,
+                  );
+                }
                 final id = await deviceTokenController.getDeviceToken();
                 await box.write('roleId', 5);
                 await deviceTokenController.postDeviceToken(
@@ -74,6 +82,13 @@ class _HomepageState extends State<Homepage> {
             ),
             ElevatedButton(
               onPressed: () async {
+                if (autoPrintController.selectedPrinter.value?.name == null) {
+                  return customSnackbar(
+                    "ERROR",
+                    "Please Select Printer First.",
+                    Colors.red,
+                  );
+                }
                 final id = await deviceTokenController.getDeviceToken();
                 await box.write('roleId', 10);
                 await deviceTokenController.postDeviceToken(
