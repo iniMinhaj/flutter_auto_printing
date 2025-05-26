@@ -288,8 +288,8 @@ class OrderItem {
   final int? quantity;
   final String? discount;
   final String? price;
-  final List<dynamic>? itemVariations;
-  final List<dynamic>? itemExtras;
+  final List<ItemVariation>? itemVariations;
+  final List<ItemExtra>? itemExtras;
   final String? itemVariationCurrencyTotal;
   final String? itemExtraCurrencyTotal;
   final double? totalConvertPrice;
@@ -340,11 +340,15 @@ class OrderItem {
     itemVariations:
         json["item_variations"] == null
             ? []
-            : List<dynamic>.from(json["item_variations"]!.map((x) => x)),
+            : List<ItemVariation>.from(
+              json["item_variations"]!.map((x) => ItemVariation.fromJson(x)),
+            ),
     itemExtras:
         json["item_extras"] == null
             ? []
-            : List<dynamic>.from(json["item_extras"]!.map((x) => x)),
+            : List<ItemExtra>.from(
+              json["item_extras"]!.map((x) => ItemExtra.fromJson(x)),
+            ),
     itemVariationCurrencyTotal: json["item_variation_currency_total"],
     itemExtraCurrencyTotal: json["item_extra_currency_total"],
     totalConvertPrice: json["total_convert_price"]?.toDouble(),
@@ -371,9 +375,11 @@ class OrderItem {
     "item_variations":
         itemVariations == null
             ? []
-            : List<dynamic>.from(itemVariations!.map((x) => x)),
+            : List<dynamic>.from(itemVariations!.map((x) => x.toJson())),
     "item_extras":
-        itemExtras == null ? [] : List<dynamic>.from(itemExtras!.map((x) => x)),
+        itemExtras == null
+            ? []
+            : List<dynamic>.from(itemExtras!.map((x) => x.toJson())),
     "item_variation_currency_total": itemVariationCurrencyTotal,
     "item_extra_currency_total": itemExtraCurrencyTotal,
     "total_convert_price": totalConvertPrice,
@@ -385,6 +391,51 @@ class OrderItem {
     "tax_name": taxName,
     "tax_currency_amount": taxCurrencyAmount,
     "total_without_tax_currency_price": totalWithoutTaxCurrencyPrice,
+  };
+}
+
+class ItemExtra {
+  final int? id;
+  final int? itemId;
+  final String? name;
+
+  ItemExtra({this.id, this.itemId, this.name});
+
+  factory ItemExtra.fromJson(Map<String, dynamic> json) =>
+      ItemExtra(id: json["id"], itemId: json["item_id"], name: json["name"]);
+
+  Map<String, dynamic> toJson() => {"id": id, "item_id": itemId, "name": name};
+}
+
+class ItemVariation {
+  final int? id;
+  final int? itemId;
+  final String? itemAttributeId;
+  final String? variationName;
+  final String? name;
+
+  ItemVariation({
+    this.id,
+    this.itemId,
+    this.itemAttributeId,
+    this.variationName,
+    this.name,
+  });
+
+  factory ItemVariation.fromJson(Map<String, dynamic> json) => ItemVariation(
+    id: json["id"],
+    itemId: json["item_id"],
+    itemAttributeId: json["item_attribute_id"],
+    variationName: json["variation_name"],
+    name: json["name"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "item_id": itemId,
+    "item_attribute_id": itemAttributeId,
+    "variation_name": variationName,
+    "name": name,
   };
 }
 
