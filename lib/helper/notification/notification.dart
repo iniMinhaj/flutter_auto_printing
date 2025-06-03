@@ -4,16 +4,19 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:auto_printing/helper/controller/auto_printer_controller.dart';
+import 'package:auto_printing/helper/controller/usb_printer_controller.dart';
 import 'package:auto_printing/helper/notification/model/notification_body.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../../widget/custom_snackbar.dart';
 
+final usbPrinterController = Get.put(UsbPrinterController());
 final autoPrintController = Get.put(AutoPrintingController());
 
 class NotificationHelper {
@@ -76,18 +79,19 @@ class NotificationHelper {
         print("NOtfi order id = $orderId");
 
         print("Order details fetching.....");
-        await autoPrintController.fetchOrderDetails(orderId: orderId);
+        await usbPrinterController.fetchOrderDetails(orderId: orderId);
 
         print(
-          "Selected Printer = ${autoPrintController.selectedPrinter.value}",
+          "Selected Printer = ${usbPrinterController.selectedUSBDevice.value}",
         );
 
-        if (autoPrintController.selectedPrinter.value == null) {
+        if (usbPrinterController.selectedUSBDevice.value == null) {
           await customSnackbar("ERROR", "No printer was selected", Colors.red);
         } else {
           print("Auto Printing started.....");
-          await autoPrintController.connectAndPrint(
-            modelName: autoPrintController.selectedPrinter.value!.name!,
+          await usbPrinterController.connectDeviceAndPrint(
+            usbPrinterController.selectedUSBDevice.value!,
+            PrinterType.usb,
           );
         }
       } else {
