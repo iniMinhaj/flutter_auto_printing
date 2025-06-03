@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:auto_printing/data/repository/device_token_repo.dart';
 import 'package:auto_printing/util/api_list.dart';
+import 'package:auto_printing/view/kitchen_page.dart';
+import 'package:auto_printing/view/salesman_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 // ignore: depend_on_referenced_packages
@@ -45,6 +47,11 @@ class DeviceTokenController extends GetxController {
               loader = false;
 
               update();
+              if (printRoleId == 5) {
+                Get.to(() => SalesmanPage());
+              } else {
+                Get.to(() => KitchenPage());
+              }
             } else {
               loader = false;
               update();
