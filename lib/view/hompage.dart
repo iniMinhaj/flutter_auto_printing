@@ -25,7 +25,8 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    usbPrinterController.scanDevices(PrinterType.bluetooth);
+    usbPrinterController.scanDevices(PrinterType.usb);
+    // usbPrinterController.scanDevices(PrinterType.bluetooth);
   }
 
   @override
@@ -35,7 +36,8 @@ class _HomepageState extends State<Homepage> {
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: () async {
-          usbPrinterController.scanDevices(PrinterType.bluetooth);
+          usbPrinterController.scanDevices(PrinterType.usb);
+          //usbPrinterController.scanDevices(PrinterType.bluetooth);
         },
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
@@ -120,6 +122,8 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              Text(deviceTokenController.printResponse.value),
             ],
           ),
         ),
@@ -152,12 +156,17 @@ class _HomepageState extends State<Homepage> {
           // Check connection before posting
           bool isConnected = await PrinterManager.instance.connect(
             type: selectedType,
-            model: BluetoothPrinterInput(
+            model: UsbPrinterInput(
               name: selectedPrinter.name,
-              address: selectedPrinter.address ?? '',
-              autoConnect: false,
-              isBle: false,
+              vendorId: selectedPrinter.vendorId,
+              productId: selectedPrinter.productId,
             ),
+            // model: BluetoothPrinterInput(
+            //   name: selectedPrinter.name,
+            //   address: selectedPrinter.address ?? '',
+            //   autoConnect: false,
+            //   isBle: false,
+            // ),
           );
 
           if (!isConnected) {

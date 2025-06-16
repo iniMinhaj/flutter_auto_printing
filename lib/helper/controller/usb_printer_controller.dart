@@ -58,7 +58,7 @@ class UsbPrinterController extends GetxController {
     switch (type) {
       case PrinterType.usb:
         bool isConnected = await printerManager.connect(
-          type: type,
+          type: PrinterType.usb,
           model: UsbPrinterInput(
             name: device.name,
             productId: device.productId,
@@ -66,22 +66,22 @@ class UsbPrinterController extends GetxController {
           ),
         );
         if (isConnected) {
-          _printBasedOnRole(type);
+          _printBasedOnRole(PrinterType.usb);
         }
         break;
 
       case PrinterType.bluetooth:
         bool isConnected = await printerManager.connect(
-          type: type,
+          type: PrinterType.bluetooth,
           model: BluetoothPrinterInput(
             name: device.name,
             address: device.address!,
-            autoConnect: true,
+            autoConnect: false,
             isBle: false,
           ),
         );
         if (isConnected) {
-          _printBasedOnRole(type);
+          _printBasedOnRole(PrinterType.bluetooth);
         }
         break;
 

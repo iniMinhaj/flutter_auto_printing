@@ -3,7 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:auto_printing/helper/controller/auto_printer_controller.dart';
 import 'package:auto_printing/helper/controller/usb_printer_controller.dart';
 import 'package:auto_printing/helper/notification/model/notification_body.dart';
 import 'package:auto_printing/view/hompage.dart';
@@ -16,7 +15,6 @@ import 'package:path_provider/path_provider.dart';
 import '../../widget/custom_snackbar.dart';
 
 final usbPrinterController = Get.put(UsbPrinterController());
-final autoPrintController = Get.put(AutoPrintingController());
 
 class NotificationHelper {
   void notificationPermission() async {
@@ -106,9 +104,6 @@ class NotificationHelper {
 
       if (message != null) {
         print("Auto Printing started onMessageOpenedApp.....");
-        await Get.put(
-          AutoPrintingController(),
-        ).connectAndPrint(modelName: 'PT-210');
       } else {
         print("kichu pai nai...");
       }
