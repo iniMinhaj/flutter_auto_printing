@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_printing/data/model/order_details_model.dart';
+import 'package:auto_printing/helper/notification/model/selectable_printer.dart';
 import 'package:auto_printing/view/hompage.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
@@ -13,76 +14,87 @@ import 'package:http/http.dart' as http;
 
 class UsbPrinterController extends GetxController {
   final printerManager = PrinterManager.instance;
-  final RxList<PrinterDevice> devices = <PrinterDevice>[].obs;
-  final Rx<PrinterDevice?> selectedUSBDevice = Rx<PrinterDevice?>(null);
+  final RxList<SelectablePrinter> devices = <SelectablePrinter>[].obs;
+  final Rx<SelectablePrinter?> selectedPrinterDevice = Rx<SelectablePrinter?>(
+    null,
+  );
+
   OrderDetailsModel orderDetailsModel = OrderDetailsModel();
 
-  void scanDevices(PrinterType type, {bool isBle = false}) {
+  void scanDevices(PrinterType type) {
     devices.clear();
 
-    PrinterManager.instance.discovery(type: type, isBle: isBle).listen((
-      device,
-    ) {
+    printerManager.discovery(type: type).listen((device) {
+      print("🔍 ${type.name.toUpperCase()} printer found: ${device.name}");
+
       final isAlreadyAdded = devices.any(
         (d) =>
-            d.name == device.name &&
-            d.vendorId == device.vendorId &&
-            d.productId == device.productId,
+            d.device.name == device.name &&
+            d.device.vendorId == device.vendorId &&
+            d.device.productId == device.productId,
       );
 
       if (!isAlreadyAdded) {
-        devices.add(device);
+        devices.add(SelectablePrinter(device: device, type: type));
       }
     });
   }
 
-  connectDeviceAndPrint(
-    PrinterDevice selectedPrinter,
-    PrinterType type, {
-    bool reconnect = false,
-    bool isBle = false,
-    String? ipAddress,
-  }) async {
-    switch (type) {
-      // only windows and android
+  void selectPrinter(SelectablePrinter printer) {
+    selectedPrinterDevice.value = printer;
+  }
 
+  Future<void> connectDeviceAndPrint() async {
+    final selected = selectedPrinterDevice.value;
+
+    if (selected == null) {
+      print("❌ No printer selected");
+      return;
+    }
+
+    final type = selected.type;
+    final device = selected.device;
+
+    switch (type) {
       case PrinterType.usb:
-        bool isConnected = await PrinterManager.instance.connect(
+        bool isConnected = await printerManager.connect(
           type: type,
           model: UsbPrinterInput(
-            name: selectedPrinter.name,
-            productId: selectedPrinter.productId,
-            vendorId: selectedPrinter.vendorId,
+            name: device.name,
+            productId: device.productId,
+            vendorId: device.vendorId,
           ),
         );
         if (isConnected) {
-          if (box.read('roleId') == 5) {
-            printInvoice();
-          } else {
-            printInvoiceForKitchen();
-          }
+          _printBasedOnRole(type);
         }
         break;
-      // only iOS and android
+
       case PrinterType.bluetooth:
-        await PrinterManager.instance.connect(
+        bool isConnected = await printerManager.connect(
           type: type,
           model: BluetoothPrinterInput(
-            name: selectedPrinter.name,
-            address: selectedPrinter.address!,
-            isBle: isBle,
-            autoConnect: reconnect,
+            name: device.name,
+            address: device.address!,
+            autoConnect: true,
+            isBle: false,
           ),
         );
+        if (isConnected) {
+          _printBasedOnRole(type);
+        }
         break;
-      case PrinterType.network:
-        await PrinterManager.instance.connect(
-          type: type,
-          model: TcpPrinterInput(
-            ipAddress: ipAddress ?? selectedPrinter.address!,
-          ),
-        );
-        break;
+
+      default:
+        print("❌ Unsupported printer type: $type");
+    }
+  }
+
+  void _printBasedOnRole(PrinterType type) {
+    if (box.read('roleId') == 5) {
+      printInvoice(type);
+    } else {
+      printInvoiceForKitchen(type);
     }
   }
 
@@ -258,7 +270,7 @@ class UsbPrinterController extends GetxController {
       bytes +=
           bytes += generator.row([
             PosColumn(text: '${item.quantity}', width: 2),
-            PosColumn(text: item.itemName ?? '', width: 8),
+            PosColumn(text: item.itemName ?? '', width: 10),
           ]);
 
       for (var variation in item.itemVariations ?? []) {
@@ -349,25 +361,25 @@ class UsbPrinterController extends GetxController {
     return bytes;
   }
 
-  void printInvoice() async {
+  void printInvoice(PrinterType type) async {
     try {
       final bytes = await buildInvoice(PaperSize.mm80); // Invoice content
-      await printerManager.send(type: PrinterType.usb, bytes: bytes);
-      print("✅ Invoice printed successfully");
+      await printerManager.send(type: type, bytes: bytes);
+      debugPrint("✅ Invoice printed successfully");
     } catch (e) {
-      print("❌ Failed to print invoice: $e");
+      debugPrint("❌ Failed to print invoice: $e");
     }
   }
 
-  void printInvoiceForKitchen() async {
+  void printInvoiceForKitchen(PrinterType type) async {
     try {
       final bytes = await buildInvoiceKitchen(
         PaperSize.mm80,
       ); // Invoice content
-      await printerManager.send(type: PrinterType.usb, bytes: bytes);
-      print("✅ Invoice printed successfully");
+      await printerManager.send(type: type, bytes: bytes);
+      debugPrint("✅ Invoice printed successfully");
     } catch (e) {
-      print("❌ Failed to print invoice: $e");
+      debugPrint("❌ Failed to print invoice: $e");
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:auto_printing/helper/controller/device_token_controller.dart';
 import 'package:auto_printing/helper/controller/usb_printer_controller.dart';
+import 'package:auto_printing/helper/notification/model/selectable_printer.dart';
 import 'package:auto_printing/widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
@@ -24,7 +25,7 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    usbPrinterController.scanDevices(PrinterType.usb);
+    usbPrinterController.scanDevices(PrinterType.bluetooth);
   }
 
   @override
@@ -34,163 +35,163 @@ class _HomepageState extends State<Homepage> {
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: () async {
-          usbPrinterController.scanDevices(PrinterType.usb);
+          usbPrinterController.scanDevices(PrinterType.bluetooth);
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: 80),
-            Obx(
-              () => Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12.withAlpha(10),
-                            blurRadius: 2,
-                            spreadRadius: .5,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(height: 80),
+              Obx(
+                () => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12.withAlpha(10),
+                              blurRadius: 2,
+                              spreadRadius: .5,
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButton<SelectablePrinter>(
+                            underline: SizedBox(),
+                            isExpanded: true,
+                            hint: Text("Select Printer"),
+                            value:
+                                usbPrinterController.devices.contains(
+                                      usbPrinterController
+                                          .selectedPrinterDevice
+                                          .value,
+                                    )
+                                    ? usbPrinterController
+                                        .selectedPrinterDevice
+                                        .value
+                                    : null,
+                            onChanged: (printer) {
+                              if (printer != null) {
+                                usbPrinterController.selectPrinter(printer);
+                              }
+                            },
+                            items:
+                                usbPrinterController.devices.map((printer) {
+                                  return DropdownMenuItem(
+                                    value: printer,
+                                    child: Text(
+                                      "${printer.device.name} (${printer.type.name})",
+                                    ),
+                                  );
+                                }).toList(),
                           ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: DropdownButton<PrinterDevice>(
-                          underline: SizedBox(),
-                          isExpanded: true,
-                          hint: Text("Select Printer"),
-                          value: usbPrinterController.selectedUSBDevice.value,
-                          onChanged: (device) {
-                            usbPrinterController.selectedUSBDevice.value =
-                                device;
-                          },
-                          items:
-                              usbPrinterController.devices.map((device) {
-                                return DropdownMenuItem(
-                                  value: device,
-                                  child: Text(device.name),
-                                );
-                              }).toList(),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 60),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: InkWell(
-                          onTap: () async {
-                            if (usbPrinterController
-                                    .selectedUSBDevice
-                                    .value
-                                    ?.name ==
-                                null) {
-                              return customSnackbar(
-                                "ERROR",
-                                "Please Select Printer First.",
-                                Colors.red,
-                              );
-                            }
-                            final id =
-                                await deviceTokenController.getDeviceToken();
-                            await box.write('roleId', 5);
-                            await deviceTokenController.postDeviceToken(
-                              deviceId: id,
-                              printRoleId: 5,
-                            );
-                          },
-                          child: Ink(
-                            height: 56,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Salesman",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+              SizedBox(height: 60),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildRoleButton(
+                      label: "Salesman",
+                      roleId: 5,
+                      padding: const EdgeInsets.only(left: 16),
+                    ),
                   ),
-                ),
-                SizedBox(width: 16),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: _buildRoleButton(
+                      label: "Kitchen",
+                      roleId: 10,
+                      padding: const EdgeInsets.only(right: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                Expanded(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: InkWell(
-                          onTap: () async {
-                            if (usbPrinterController
-                                    .selectedUSBDevice
-                                    .value
-                                    ?.name ==
-                                null) {
-                              return customSnackbar(
-                                "ERROR",
-                                "Please Select Printer First.",
-                                Colors.red,
-                              );
-                            }
-                            final id =
-                                await deviceTokenController.getDeviceToken();
-                            await box.write('roleId', 10);
-                            await deviceTokenController.postDeviceToken(
-                              deviceId: id,
-                              printRoleId: 10,
-                            );
-                          },
-                          child: Ink(
-                            height: 56,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Kitchen",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+  Widget _buildRoleButton({
+    required String label,
+    required int roleId,
+    required EdgeInsets padding,
+  }) {
+    return Padding(
+      padding: padding,
+      child: InkWell(
+        onTap: () async {
+          final selectedPrinter =
+              usbPrinterController.selectedPrinterDevice.value?.device;
+          final selectedType =
+              usbPrinterController.selectedPrinterDevice.value?.type;
+
+          if (selectedPrinter == null || selectedType == null) {
+            return customSnackbar(
+              "ERROR",
+              "Please select and connect printer first.",
+              Colors.red,
+            );
+          }
+
+          // Check connection before posting
+          bool isConnected = await PrinterManager.instance.connect(
+            type: selectedType,
+            model: BluetoothPrinterInput(
+              name: selectedPrinter.name,
+              address: selectedPrinter.address ?? '',
+              autoConnect: false,
+              isBle: false,
             ),
-          ],
+          );
+
+          if (!isConnected) {
+            return customSnackbar(
+              "ERROR",
+              "Printer is not connected. Please connect first.",
+              Colors.red,
+            );
+          }
+
+          final id = await deviceTokenController.getDeviceToken();
+          await box.write('roleId', roleId);
+          await deviceTokenController.postDeviceToken(
+            deviceId: id,
+            printRoleId: roleId,
+          );
+        },
+        child: Ink(
+          height: 56,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: primaryColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
     );
