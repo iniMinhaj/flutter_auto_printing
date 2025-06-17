@@ -1,4 +1,4 @@
-import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
+import 'package:thermal_printer_plus/thermal_printer.dart';
 
 class SelectablePrinter {
   final PrinterDevice device;

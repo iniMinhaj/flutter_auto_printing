@@ -92,7 +92,6 @@ class NotificationHelper {
           return;
         }
 
-        print("🖨️ Auto Printing started...");
         await usbPrinterController.connectDeviceAndPrint();
       } else {
         print("⚠️ No valid notification body found.");

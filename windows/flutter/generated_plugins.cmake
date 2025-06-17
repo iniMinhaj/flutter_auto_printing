@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
-  flutter_pos_printer_platform_image_3
+  thermal_printer_plus
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
