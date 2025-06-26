@@ -138,6 +138,7 @@ class UsbPrinterController extends GetxController {
     final generator = Generator(paper, profile);
 
     List<int> bytes = [];
+
     final order = orderDetailsModel.data;
     // Dynamic line separator based on paper size
     final lineSeparator = (paper == PaperSize.mm80 ? '-' * 48 : '-' * 32);

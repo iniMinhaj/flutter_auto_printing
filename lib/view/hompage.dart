@@ -3,8 +3,7 @@ import 'package:auto_printing/helper/controller/usb_printer_controller.dart';
 import 'package:auto_printing/helper/notification/model/selectable_printer.dart';
 import 'package:auto_printing/widget/custom_snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/instance_manager.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:thermal_printer_plus/thermal_printer.dart';
 
@@ -26,7 +25,7 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     usbPrinterController.scanDevices(PrinterType.usb);
-    // usbPrinterController.scanDevices(PrinterType.bluetooth);
+    //  usbPrinterController.scanDevices(PrinterType.bluetooth);
   }
 
   @override
@@ -37,7 +36,7 @@ class _HomepageState extends State<Homepage> {
         color: primaryColor,
         onRefresh: () async {
           usbPrinterController.scanDevices(PrinterType.usb);
-          //usbPrinterController.scanDevices(PrinterType.bluetooth);
+          // usbPrinterController.scanDevices(PrinterType.bluetooth);
         },
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
@@ -51,6 +50,15 @@ class _HomepageState extends State<Homepage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        "DOMAIN:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      SizedBox(height: 20),
                       Container(
                         width: double.infinity,
                         height: 160,
@@ -107,7 +115,7 @@ class _HomepageState extends State<Homepage> {
                 children: [
                   Expanded(
                     child: _buildRoleButton(
-                      label: "Salesman",
+                      label: "PRINT RECIEPTS",
                       roleId: 5,
                       padding: const EdgeInsets.only(left: 16),
                     ),
@@ -115,15 +123,13 @@ class _HomepageState extends State<Homepage> {
                   SizedBox(width: 16),
                   Expanded(
                     child: _buildRoleButton(
-                      label: "Kitchen",
+                      label: "PRINT ORDERS",
                       roleId: 10,
                       padding: const EdgeInsets.only(right: 16),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(deviceTokenController.printResponse.value),
             ],
           ),
         ),
@@ -195,7 +201,7 @@ class _HomepageState extends State<Homepage> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
