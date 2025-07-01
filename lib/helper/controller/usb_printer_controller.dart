@@ -141,7 +141,8 @@ class UsbPrinterController extends GetxController {
 
     final order = orderDetailsModel.data;
     // Dynamic line separator based on paper size
-    final lineSeparator = (paper == PaperSize.mm80 ? '-' * 48 : '-' * 32);
+    final charsPerLine = paper == PaperSize.mm80 ? 48 : 32;
+    final lineSeparator = List.filled(charsPerLine, '-').join();
 
     // Header
     bytes += generator.text(
@@ -163,10 +164,10 @@ class UsbPrinterController extends GetxController {
 
     // Table header
     bytes += generator.row([
-      PosColumn(text: 'Qty', width: 2, styles: PosStyles(align: PosAlign.left)),
+      PosColumn(text: 'Qty', width: 1),
       PosColumn(
         text: 'Item Name',
-        width: 7,
+        width: 8,
         styles: PosStyles(align: PosAlign.center),
       ),
       PosColumn(
@@ -175,57 +176,56 @@ class UsbPrinterController extends GetxController {
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
-    bytes += generator.text(lineSeparator);
 
     // Items
     for (OrderItem item in orderDetailsModel.data?.orderItems ?? []) {
       // Main item row
       bytes += generator.row([
-        PosColumn(text: '${item.quantity}', width: 2),
-        PosColumn(text: item.itemName ?? '', width: 7),
+        PosColumn(text: '${item.quantity}', width: 1),
+        PosColumn(text: item.itemName ?? '', width: 8),
         PosColumn(
           text: item.totalCurrencyPrice ?? '',
           width: 3,
           styles: PosStyles(align: PosAlign.right),
         ),
       ]);
-
+      // Variations
       // Variations
       for (var variation in item.itemVariations ?? []) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 1),
           PosColumn(
             text: '  ${variation.variationName}: ${variation.name}',
             width: 8,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 3),
         ]);
       }
 
       // Extras
       for (var extra in item.itemExtras ?? []) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 1),
           PosColumn(
             text: '  Extra: ${extra.name}',
             width: 8,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 3),
         ]);
       }
 
       // Instructions
       if ((item.instruction ?? '').isNotEmpty) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 1),
           PosColumn(
             text: '  Instruction: ${item.instruction}',
             width: 8,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 3),
         ]);
       }
 
@@ -236,34 +236,34 @@ class UsbPrinterController extends GetxController {
 
     bytes += generator.text(lineSeparator);
     bytes += generator.row([
-      PosColumn(text: 'Subtotal:', width: 8),
+      PosColumn(text: 'Subtotal:', width: 9),
       PosColumn(
         text: order?.subtotalWithoutTaxCurrencyPrice.toString() ?? '',
-        width: 4,
+        width: 3,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Tax:', width: 8),
+      PosColumn(text: 'Tax:', width: 9),
       PosColumn(
         text: order?.totalTaxCurrencyPrice.toString() ?? '',
-        width: 4,
+        width: 3,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Discount:', width: 8),
+      PosColumn(text: 'Discount:', width: 9),
       PosColumn(
         text: order?.discountCurrencyPrice.toString() ?? '',
-        width: 4,
+        width: 3,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Total:', width: 8),
+      PosColumn(text: 'Total:', width: 9),
       PosColumn(
         text: order?.totalCurrencyPrice.toString() ?? '',
-        width: 4,
+        width: 3,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
@@ -310,7 +310,8 @@ class UsbPrinterController extends GetxController {
     final order = orderDetailsModel.data;
 
     // Dynamic line separator based on paper size
-    final separatorLine = (paper == PaperSize.mm80 ? '-' * 48 : '-' * 32);
+    final charsPerLine = paper == PaperSize.mm80 ? 48 : 32;
+    final separatorLine = List.filled(charsPerLine, '-').join();
 
     // ---------- Header ----------
     bytes += generator.text(
@@ -338,17 +339,17 @@ class UsbPrinterController extends GetxController {
     for (var item in order?.orderItems ?? []) {
       // Main item row
       bytes += generator.row([
-        PosColumn(text: '${item.quantity}', width: 2),
-        PosColumn(text: item.itemName ?? '', width: 10),
+        PosColumn(text: '${item.quantity}', width: 1),
+        PosColumn(text: item.itemName ?? '', width: 11),
       ]);
 
       // Variations
       for (var variation in item.itemVariations ?? []) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 1),
           PosColumn(
             text: '  ${variation.variationName}: ${variation.name}',
-            width: 10,
+            width: 11,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
         ]);
@@ -357,10 +358,10 @@ class UsbPrinterController extends GetxController {
       // Extras
       for (var extra in item.itemExtras ?? []) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
+          PosColumn(text: '', width: 1),
           PosColumn(
             text: '  Extra: ${extra.name}',
-            width: 10,
+            width: 11,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
         ]);
@@ -369,8 +370,8 @@ class UsbPrinterController extends GetxController {
       // Instruction
       if ((item.instruction ?? '').isNotEmpty) {
         bytes += generator.row([
-          PosColumn(text: '', width: 2),
-          PosColumn(text: '  Instruction: ${item.instruction}', width: 10),
+          PosColumn(text: '', width: 1),
+          PosColumn(text: '  Instruction: ${item.instruction}', width: 11),
         ]);
       }
 
