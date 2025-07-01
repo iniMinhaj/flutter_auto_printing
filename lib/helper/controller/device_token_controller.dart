@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_printing/data/repository/device_token_repo.dart';
+import 'package:auto_printing/helper/get_response.dart';
 import 'package:auto_printing/util/api_list.dart';
 import 'package:auto_printing/view/kitchen_page.dart';
 import 'package:auto_printing/view/salesman_page.dart';
@@ -17,6 +18,7 @@ final authorizationToken =
 class DeviceTokenController extends GetxController {
   final tokenRepo = DeviceTokenRepo();
   bool loader = false;
+  final printResponse = "".obs;
 
   Future<String> getDeviceToken() async {
     final deviceId = await tokenRepo.getDeviceToken() ?? "";
@@ -42,6 +44,7 @@ class DeviceTokenController extends GetxController {
             headers: _getHttpHeaders(),
           )
           .then((response) {
+            printResponse.value = getResponse(response.body);
             if (response.statusCode == 200 || response.statusCode == 201) {
               debugPrint(response.body);
               loader = false;

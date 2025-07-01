@@ -4,4 +4,7 @@ class ApiList {
   static String autoPrint = "$baseUrl/api/auto-print";
   static String orderDetails({required String orderId}) =>
       "$baseUrl/api/auto-print/order/$orderId";
+
+  static String salesOrderApi = "$baseUrl/api/auto-print/old-orders";
+  static String settings = "$baseUrl/api/auto-print/company";
 }
