@@ -114,10 +114,7 @@ class UsbPrinterController extends GetxController {
     try {
       final response = await http.get(
         Uri.parse(ApiList.orderDetails(orderId: orderId)),
-        headers: {
-          'x-api-key': ApiList.licenseCode.toString(),
-          'content-type': 'application/json',
-        },
+        headers: {'content-type': 'application/json'},
       );
 
       print("orderDetails = ${response.body}");

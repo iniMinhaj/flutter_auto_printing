@@ -71,7 +71,6 @@ class DeviceTokenController extends GetxController {
 
   static Map<String, String> _getHttpHeaders() {
     Map<String, String> headers = <String, String>{};
-    headers['x-api-key'] = ApiList.licenseCode.toString();
     headers['content-type'] = 'application/json';
 
     return headers;
