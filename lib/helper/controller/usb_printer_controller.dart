@@ -164,12 +164,12 @@ class UsbPrinterController extends GetxController {
       PosColumn(text: 'Qty', width: 1),
       PosColumn(
         text: 'Item Name',
-        width: 7,
+        width: 6,
         styles: PosStyles(align: PosAlign.center),
       ),
       PosColumn(
         text: 'Total',
-        width: 4,
+        width: 5,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
@@ -185,12 +185,12 @@ class UsbPrinterController extends GetxController {
         ),
         PosColumn(
           text: item.itemName ?? '',
-          width: 7,
+          width: 6,
           styles: PosStyles(fontType: PosFontType.fontB),
         ),
         PosColumn(
           text: item.totalCurrencyPrice ?? '',
-          width: 4,
+          width: 5,
           styles: PosStyles(align: PosAlign.right, fontType: PosFontType.fontB),
         ),
       ]);
@@ -205,12 +205,12 @@ class UsbPrinterController extends GetxController {
           ),
           PosColumn(
             text: '  ${variation.variationName}: ${variation.name}',
-            width: 7,
+            width: 6,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
           PosColumn(
             text: '',
-            width: 4,
+            width: 5,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
         ]);
@@ -226,12 +226,12 @@ class UsbPrinterController extends GetxController {
           ),
           PosColumn(
             text: '  Extra: ${extra.name}',
-            width: 7,
+            width: 6,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
           PosColumn(
             text: '',
-            width: 4,
+            width: 5,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
         ]);
@@ -247,12 +247,12 @@ class UsbPrinterController extends GetxController {
           ),
           PosColumn(
             text: '  Instruction: ${item.instruction}',
-            width: 7,
+            width: 6,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
           PosColumn(
             text: '',
-            width: 4,
+            width: 5,
             styles: PosStyles(fontType: PosFontType.fontB),
           ),
         ]);
@@ -265,34 +265,34 @@ class UsbPrinterController extends GetxController {
 
     bytes += generator.text(lineSeparator);
     bytes += generator.row([
-      PosColumn(text: 'Subtotal:', width: 7),
+      PosColumn(text: 'Subtotal:', width: 6),
       PosColumn(
         text: order?.subtotalWithoutTaxCurrencyPrice.toString() ?? '',
-        width: 5,
+        width: 6,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Tax:', width: 7),
+      PosColumn(text: 'Tax:', width: 6),
       PosColumn(
         text: order?.totalTaxCurrencyPrice.toString() ?? '',
-        width: 5,
+        width: 6,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Discount:', width: 7),
+      PosColumn(text: 'Discount:', width: 6),
       PosColumn(
         text: order?.discountCurrencyPrice.toString() ?? '',
-        width: 5,
+        width: 6,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
     bytes += generator.row([
-      PosColumn(text: 'Total:', width: 7),
+      PosColumn(text: 'Total:', width: 6),
       PosColumn(
         text: order?.totalCurrencyPrice.toString() ?? '',
-        width: 5,
+        width: 6,
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);

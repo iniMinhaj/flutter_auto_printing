@@ -1,5 +1,7 @@
 import 'package:auto_printing/helper/controller/usb_printer_controller.dart';
 import 'package:auto_printing/helper/notification/notification.dart';
+import 'package:auto_printing/view/kitchen_page.dart';
+import 'package:auto_printing/view/salesman_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';

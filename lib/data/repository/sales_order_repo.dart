@@ -1,17 +1,18 @@
 import 'dart:convert';
 
-import 'package:auto_printing/model/sales_order_model.dart';
+import 'package:auto_printing/model/show_order_model.dart';
 import 'package:auto_printing/util/api_list.dart';
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 
-class SalesOrderRepo {
-  Future<Either<String, List<SalesOrderModel>>> getSalesOrderList() async {
+class ShowOrderRepo {
+  Future<Either<String, List<ShowOrderModel>>> getOrderList() async {
     try {
       final response = await http.get(Uri.parse(ApiList.salesOrderApi));
       if (response.statusCode == 200) {
+        print('Response: ${response.body}');
         final data = jsonDecode(response.body)['data'] as List<dynamic>;
-        return Right(data.map((e) => SalesOrderModel.fromJson(e)).toList());
+        return Right(data.map((e) => ShowOrderModel.fromJson(e)).toList());
       } else {
         return Left(response.body);
       }

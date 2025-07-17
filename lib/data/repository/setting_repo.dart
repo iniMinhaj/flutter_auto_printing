@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:auto_printing/model/sales_order_model.dart';
+import 'package:auto_printing/model/show_order_model.dart';
 import 'package:auto_printing/model/setting_model.dart';
 import 'package:auto_printing/util/api_list.dart';
 import 'package:dartz/dartz.dart';
