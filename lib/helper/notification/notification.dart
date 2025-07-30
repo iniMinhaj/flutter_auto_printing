@@ -69,14 +69,10 @@ class NotificationHelper {
 
       print('🔥 [onMessage] Received a notification');
       await customSnackbar("Success", "Received a notification", primaryColor);
-      print("📦 Message Body: ${message.notification?.body}");
-      print("📨 Full Message: ${message.toMap()}");
 
       if (message.notification?.body != null) {
         final orderId = message.notification!.body!;
-        print("🧾 Order ID received: $orderId");
 
-        print("📥 Fetching order details...");
         await usbPrinterController.fetchOrderDetails(orderId: orderId);
 
         final selectedPrinter =
@@ -84,28 +80,17 @@ class NotificationHelper {
         final selectedType =
             usbPrinterController.selectedPrinterDevice.value?.type;
 
-        print("🖨️ Selected Printer: $selectedPrinter");
-        print("🧭 Printer Type: $selectedType");
-
         if (selectedPrinter == null || selectedType == null) {
           await customSnackbar("ERROR", "No printer was selected", Colors.red);
           return;
         }
 
         await usbPrinterController.connectDeviceAndPrint();
-      } else {
-        print("⚠️ No valid notification body found.");
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) async {
       print('Full Message: ${message!.toMap()}');
-
-      if (message != null) {
-        print("Auto Printing started onMessageOpenedApp.....");
-      } else {
-        print("kichu pai nai...");
-      }
     });
   }
 

@@ -10,7 +10,6 @@ class ShowOrderRepo {
     try {
       final response = await http.get(Uri.parse(ApiList.salesOrderApi));
       if (response.statusCode == 200) {
-        print('Response: ${response.body}');
         final data = jsonDecode(response.body)['data'] as List<dynamic>;
         return Right(data.map((e) => ShowOrderModel.fromJson(e)).toList());
       } else {

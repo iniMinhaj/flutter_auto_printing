@@ -1,5 +1,5 @@
 class ApiList {
-  static String baseUrl = "https://web.inilabs.dev";
+  static String baseUrl = "https://cu-pizza.oncampusdining.com";
   static String autoPrint = "$baseUrl/api/auto-print";
   static String orderDetails({required String orderId}) =>
       "$baseUrl/api/auto-print/order/$orderId";
