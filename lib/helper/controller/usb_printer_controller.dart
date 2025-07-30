@@ -12,7 +12,6 @@ import 'package:thermal_printer_plus/esc_pos_utils_platform/src/generator.dart';
 import 'package:thermal_printer_plus/esc_pos_utils_platform/src/pos_column.dart';
 import 'package:thermal_printer_plus/esc_pos_utils_platform/src/pos_styles.dart';
 import 'package:thermal_printer_plus/thermal_printer.dart';
-
 import '../../util/api_list.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
@@ -135,22 +134,20 @@ class UsbPrinterController extends GetxController {
     List<int> bytes = [];
 
     final order = orderDetailsModel.data;
-    final charsPerLine = paper == PaperSize.mm80 ? 48 : 42;
-    final lineSeparator = List.filled(charsPerLine, '-').join();
+
+    // Estimate max characters per line based on paper size
+    final charsPerLine = paper == PaperSize.mm80 ? 64 : 52;
+    final lineSeparator = '-' * charsPerLine;
 
     String truncate(String text, int max) {
       return text.length > max ? '${text.substring(0, max - 3)}...' : text;
     }
 
-    // Helper function for consistent line separator
     void addLineSeparator() {
-      bytes += generator.row([
-        PosColumn(
-          text: lineSeparator,
-          width: 12,
-          styles: PosStyles(align: PosAlign.left),
-        ),
-      ]);
+      bytes += generator.text(
+        lineSeparator,
+        styles: PosStyles(align: PosAlign.left),
+      );
     }
 
     // Header
@@ -169,11 +166,10 @@ class UsbPrinterController extends GetxController {
       "${order?.orderDate ?? ''} ${order?.orderTime ?? ''}",
     );
     addLineSeparator();
-    bytes += generator.feed(1);
 
     // Table header
     bytes += generator.row([
-      PosColumn(text: 'Qty', width: 2),
+      PosColumn(text: 'Qty', width: 2, styles: PosStyles(align: PosAlign.left)),
       PosColumn(
         text: 'Item Name',
         width: 6,
@@ -185,6 +181,7 @@ class UsbPrinterController extends GetxController {
         styles: PosStyles(align: PosAlign.right),
       ),
     ]);
+    addLineSeparator();
 
     // Items
     for (OrderItem item in orderDetailsModel.data?.orderItems ?? []) {
@@ -294,23 +291,10 @@ class UsbPrinterController extends GetxController {
 
     // Footer
     bytes += generator.feed(2);
-    bytes += generator.row([
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.left, bold: true),
-      ),
-      PosColumn(
-        width: 6,
-        text: 'Thank you!',
-        styles: PosStyles(align: PosAlign.center, bold: true),
-      ),
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
+    bytes += generator.text(
+      'Thank you!',
+      styles: PosStyles(align: PosAlign.center, bold: true),
+    );
     bytes += generator.feed(2);
     bytes += generator.cut();
 
@@ -325,18 +309,15 @@ class UsbPrinterController extends GetxController {
     final order = orderDetailsModel.data;
 
     // Dynamic line separator based on paper size
-    final charsPerLine = paper == PaperSize.mm80 ? 48 : 32;
-    final separatorLine = List.filled(charsPerLine, '-').join();
+    final charsPerLine = paper == PaperSize.mm80 ? 64 : 52;
+    final separatorLine = '-' * charsPerLine;
 
     // Helper function for consistent line separator
     void addLineSeparator() {
-      bytes += generator.row([
-        PosColumn(
-          text: separatorLine,
-          width: 12,
-          styles: PosStyles(align: PosAlign.left),
-        ),
-      ]);
+      bytes += generator.text(
+        separatorLine,
+        styles: PosStyles(align: PosAlign.left),
+      );
     }
 
     // ---------- Header ----------
@@ -359,8 +340,11 @@ class UsbPrinterController extends GetxController {
       "${order?.orderDate ?? ''} ${order?.orderTime ?? ''}",
     );
     addLineSeparator();
-    bytes += generator.feed(1);
-
+    bytes += generator.row([
+      PosColumn(text: 'Qty', width: 1),
+      PosColumn(text: 'Item Name', width: 11),
+    ]);
+    addLineSeparator();
     // ---------- Items ----------
     for (var item in order?.orderItems ?? []) {
       // Main item row
@@ -417,41 +401,15 @@ class UsbPrinterController extends GetxController {
     // ---------- Footer ----------
     bytes += generator.feed(2);
 
-    bytes += generator.row([
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.left, bold: true),
-      ),
-      PosColumn(
-        width: 6,
-        text: 'Thank you!',
-        styles: PosStyles(align: PosAlign.center, bold: true),
-      ),
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
+    bytes += generator.text(
+      'Thank you!',
+      styles: PosStyles(align: PosAlign.center, bold: true),
+    );
+    bytes += generator.text(
+      'Visit Again',
+      styles: PosStyles(align: PosAlign.center, bold: true),
+    );
 
-    bytes += generator.row([
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.left, bold: true),
-      ),
-      PosColumn(
-        width: 6,
-        text: 'Visit Again',
-        styles: PosStyles(align: PosAlign.center, bold: true),
-      ),
-      PosColumn(
-        width: 3,
-        text: '',
-        styles: PosStyles(align: PosAlign.right, bold: true),
-      ),
-    ]);
     bytes += generator.feed(2);
     bytes += generator.cut();
 

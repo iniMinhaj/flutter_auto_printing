@@ -94,29 +94,52 @@ class _KitchenPageState extends State<KitchenPage> {
                                 child: Row(
                                   children: [
                                     GestureDetector(
-                                      onTap: () async {
-                                        final isSuccess =
-                                            await showOrderController
-                                                .readyToPickup(
-                                                  orderId: order[index].id!,
-                                                );
-                                        if (isSuccess) {
-                                          showOrderController.getOrderList();
-                                          setState(() {});
-                                        }
-                                      },
+                                      onTap:
+                                          order[index].orderStatus == 13
+                                              ? null
+                                              : () async {
+                                                final isSuccess =
+                                                    await showOrderController
+                                                        .readyToPickup(
+                                                          orderId:
+                                                              order[index].id!,
+                                                        );
+                                                if (isSuccess) {
+                                                  showOrderController
+                                                      .getOrderList();
+                                                  setState(() {});
+                                                }
+                                              },
                                       child:
                                           order[index].orderStatus == 1 ||
                                                   order[index].orderStatus ==
-                                                      11 ||
-                                                  order[index].orderStatus ==
-                                                      13 ||
-                                                  order[index].orderStatus ==
                                                       19 ||
                                                   order[index].orderStatus == 22
-                                              ? Image.asset(
-                                                'assets/checkmark.png',
-                                                height: 24.h,
+                                              ? SizedBox()
+                                              : order[index].orderStatus == 13
+                                              ? Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green.shade100,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  child: Text(
+                                                    "Completed",
+                                                    style: TextStyle(
+                                                      color: Colors.teal,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
                                               )
                                               : Container(
                                                 decoration: BoxDecoration(
@@ -132,7 +155,10 @@ class _KitchenPageState extends State<KitchenPage> {
                                                     vertical: 4.h,
                                                   ),
                                                   child: Text(
-                                                    'Ready To Pickup',
+                                                    order[index].orderStatus ==
+                                                            11
+                                                        ? "Delivered"
+                                                        : 'Ready To Pickup',
                                                     style: GoogleFonts.rubik(
                                                       fontSize: 14.sp,
                                                       color: Colors.white,
