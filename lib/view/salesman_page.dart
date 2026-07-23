@@ -23,7 +23,7 @@ class _SalesmanPageState extends State<SalesmanPage> {
 
   @override
   void initState() {
-    showOrderController.getSalesOrderList();
+    showOrderController.getOrderList();
     settingController.getSettings();
     super.initState();
   }
@@ -54,29 +54,25 @@ class _SalesmanPageState extends State<SalesmanPage> {
           SizedBox(height: 16.h),
           Expanded(
             child: Obx(
-              () => ListView.builder(
-                shrinkWrap: true,
-                itemCount: showOrderController.salesOrderList.length,
-                itemBuilder: (context, index) {
-                  final order = showOrderController.salesOrderList;
-                  return Padding(
-                    padding: EdgeInsets.all(8.r),
-                    child: Container(
-                      height: 60.h,
-                      width: double.infinity,
+              () => RefreshIndicator(
+                color: primaryColor,
+                onRefresh: () => showOrderController.getOrderList(),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: showOrderController.orderList.length,
+                  itemBuilder: (context, index) {
+                    final order = showOrderController.orderList;
 
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: Colors.black12),
-                      ),
-                      child: GestureDetector(
-                        onTap: () async {
-                          await usbPrinterController.fetchOrderDetails(
-                            orderId: order[index].id.toString(),
-                          );
+                    return Padding(
+                      padding: EdgeInsets.all(8.r),
+                      child: Container(
+                        height: 60.h,
+                        width: double.infinity,
 
-                          await usbPrinterController.connectDeviceAndPrint();
-                        },
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: Colors.black12),
+                        ),
                         child: Padding(
                           padding: EdgeInsets.all(8.r),
                           child: Stack(
@@ -98,34 +94,129 @@ class _SalesmanPageState extends State<SalesmanPage> {
                               Positioned(
                                 top: 4.h,
                                 right: 0.w,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: primaryColor,
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12.w,
-                                      vertical: 4.h,
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap:
+                                          order[index].orderStatus == 13
+                                              ? null
+                                              : () async {
+                                                final isSuccess =
+                                                    await showOrderController
+                                                        .readyToPickup(
+                                                          orderId:
+                                                              order[index].id!,
+                                                        );
+                                                if (isSuccess) {
+                                                  showOrderController
+                                                      .getOrderList();
+                                                  setState(() {});
+                                                }
+                                              },
+                                      child:
+                                          order[index].orderStatus == 1 ||
+                                                  order[index].orderStatus ==
+                                                      19 ||
+                                                  order[index].orderStatus == 22
+                                              ? SizedBox()
+                                              : order[index].orderStatus == 13
+                                              ? Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green.shade100,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  child: Text(
+                                                    "Completed",
+                                                    style: TextStyle(
+                                                      color: Colors.teal,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              : Container(
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  child: Text(
+                                                    order[index].orderStatus ==
+                                                            11
+                                                        ? "Delivered"
+                                                        : 'Ready To Pickup',
+                                                    style: GoogleFonts.rubik(
+                                                      fontSize: 14.sp,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                     ),
-                                    child: Text(
-                                      'Print',
-                                      style: GoogleFonts.rubik(
-                                        fontSize: 14.sp,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w400,
+                                    SizedBox(width: 8.w),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await usbPrinterController
+                                            .fetchOrderDetails(
+                                              orderId:
+                                                  order[index].id.toString(),
+                                            );
+
+                                        await usbPrinterController
+                                            .connectDeviceAndPrint();
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: primaryColor,
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12.w,
+                                            vertical: 4.h,
+                                          ),
+                                          child: Text(
+                                            'Print',
+                                            style: GoogleFonts.rubik(
+                                              fontSize: 14.sp,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
